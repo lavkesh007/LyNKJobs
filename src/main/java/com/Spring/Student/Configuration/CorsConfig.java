@@ -15,7 +15,8 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedOrigins("*")   // 🔥 ngrok safe
                         .allowedMethods("*")
-                        .allowedHeaders("*");
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }
