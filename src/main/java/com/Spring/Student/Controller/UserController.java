@@ -33,7 +33,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import tools.jackson.databind.ObjectMapper;
 
-@CrossOrigin(origins = "*")
+
 @RestController
 @RequestMapping("/user")
 public class UserController {

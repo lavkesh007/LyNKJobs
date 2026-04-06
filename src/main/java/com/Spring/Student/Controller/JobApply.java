@@ -10,7 +10,7 @@ import com.Spring.Student.Services.ApplyJobsServices;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
-@CrossOrigin(origins = "*")
+
 @RestController
 @RequestMapping("/user")
 public class JobApply {

@@ -20,7 +20,7 @@ import com.Spring.Student.Services.JobsServices;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
-@CrossOrigin(origins = "*")
+
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
