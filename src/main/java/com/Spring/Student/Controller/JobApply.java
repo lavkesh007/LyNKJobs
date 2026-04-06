@@ -12,7 +12,6 @@ import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@CrossOrigin(origins = "https://lynkjob.d1z9wprzw5dh5p.amplifyapp.com")
 @RequestMapping("/user")
 public class JobApply {
 	ApplyJobsServices applyService;

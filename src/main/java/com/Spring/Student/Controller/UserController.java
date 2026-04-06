@@ -33,7 +33,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import tools.jackson.databind.ObjectMapper;
 
-@CrossOrigin(origins = "https://lynkjob.d1z9wprzw5dh5p.amplifyapp.com")
 
 @RestController
 @RequestMapping("/user")

@@ -12,7 +12,6 @@ import com.Spring.Student.Services.JobsServices;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
-@CrossOrigin(origins = "https://lynkjob.d1z9wprzw5dh5p.amplifyapp.com")
 @RestController
 @RequestMapping("/jobs")
 public class JobsController {
