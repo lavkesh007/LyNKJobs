@@ -13,10 +13,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(Customizer.withDefaults()) // ✅ FIXED (IMPORTANT)
+            .cors(Customizer.withDefaults()) // ✅ MUST
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 🔥 CRITICAL
                 .requestMatchers("/user/login").permitAll()
                 .requestMatchers("/jobs").permitAll()
                 .anyRequest().permitAll()
