@@ -23,6 +23,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/admin")
+@CrossOrigin(origins = "https://lynkjob.d1z9wprzw5dh5p.amplifyapp.com")
 public class AdminController {
 	
 	AdminServices services;
