@@ -13,6 +13,7 @@ import com.Spring.Student.Services.JobsServices;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 @RestController
+@CrossOrigin(origins = "*") 
 @RequestMapping("/jobs")
 public class JobsController {
 	private JobsServices services;

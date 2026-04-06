@@ -12,6 +12,7 @@ import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
+@CrossOrigin(origins = "*") 
 @RequestMapping("/user")
 public class JobApply {
 	ApplyJobsServices applyService;

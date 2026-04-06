@@ -22,6 +22,7 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
+@CrossOrigin(origins = "*") 
 @RequestMapping("/admin")
 public class AdminController {
 	

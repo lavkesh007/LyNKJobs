@@ -35,6 +35,7 @@ import tools.jackson.databind.ObjectMapper;
 
 
 @RestController
+@CrossOrigin(origins = "*") 
 @RequestMapping("/user")
 public class UserController {
 	UserServices service;
