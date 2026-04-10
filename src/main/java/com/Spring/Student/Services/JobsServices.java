@@ -5,21 +5,31 @@ import com.Spring.Student.Jobs.PresentJobs;
 import com.Spring.Student.Repository.JobRepo;
 import com.Spring.Student.Repository.PresentJobsRepo;
 import com.Spring.Student.Repository.UserMessageRepo;
+import com.Spring.Student.Repository.UserRepo;
 import com.Spring.Student.UserModel.UserMessage;
+import com.Spring.Student.UserModel.UserRegister;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 @Service
 public class JobsServices {
+	
 	private JobRepo jobRepo;
 	@Autowired
 	private PresentJobsRepo presentJob; 
 	@Autowired
 	private UserMessageRepo messageRepo;
+	@Autowired
+	private EmailSender sender;
+	
 	public JobsServices(JobRepo jobRepo) {
 		this.jobRepo = jobRepo;
 	}
@@ -64,6 +74,7 @@ public class JobsServices {
 		job.setJobID(id);
 		jobRepo.save(job);
 		presentJob.save(new PresentJobs(id,job.getExpireDate()));
+		sender.emailSender(job.getCompanyName(),job.getRole());
 		return "Job Added!!!";
 	}
 	
@@ -119,4 +130,5 @@ public class JobsServices {
 		messageRepo.deleteById(id);
 		return "Message Delete";
 	}
+	
 }
