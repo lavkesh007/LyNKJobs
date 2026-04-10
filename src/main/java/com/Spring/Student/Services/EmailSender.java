@@ -39,11 +39,17 @@ public class EmailSender {
             message.setTo(email);
             message.setSubject("New Job Opportunity Added on LyNK Jobs!");
             message.setText(
-                    "Hi,\n\n" +
-                    "A new job has been posted at " + companyName + " for the role of " + role + ".\n\n" +
-                    "Log in to LyNK Jobs and apply now!\n\n" +
-                    "Best regards,\nTeam LyNK Jobs"
-            );
+            	    "Hi,\n\n" +
+            	    "We’re excited to inform you that a new job opportunity has just been posted on LyNK Jobs!\n\n" +
+            	    "🏢 Company: " + companyName + "\n" +
+            	    "💼 Role: " + role + "\n\n" +
+            	    "If you’ve been looking for the right opportunity to grow your career, this could be the perfect match for you. At LyNK Jobs, we aim to connect talented individuals like you with companies that are actively hiring and looking for your skills.\n\n" +
+            	    "Don’t miss out on this opportunity! Log in to your LyNK Jobs account today to view complete job details, check eligibility, and submit your application with ease.\n\n" +
+            	    "🔔 Not registered yet? Sign up on LyNK Jobs to receive instant notifications about the latest job openings tailored to your profile. Stay ahead of the competition and never miss an opportunity again.\n\n" +
+            	    "Your next career move is just a click away. Take action now and apply before the position gets filled!\n\n" +
+            	    "Best regards,\n" +
+            	    "Team LyNK Jobs"
+            	);
 
             mailSender.send(message);
         }
