@@ -22,7 +22,7 @@ public class Token {
 						.setSubject(userName)
 						.claim("userID", userID)
 						.setIssuedAt(new Date())
-						.setExpiration(new Date(System.currentTimeMillis()+ 1000 * 60 * 60))
+						.setExpiration(new Date(System.currentTimeMillis()+ 1000 * 60 * 60 * 12))
 						.signWith(SIGN_KEY)
 						.compact();
 		return token;
