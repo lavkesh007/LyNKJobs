@@ -286,4 +286,24 @@ public class UserController {
 			return ResponseEntity.status(401).body("Invalid Token");
 		}
 	}
+	
+	@GetMapping("/validateUser")
+	public ResponseEntity<?> validateUser(HttpServletRequest request){
+		String token = tokenservice.getToken(request);
+		if(token == null) {
+			return ResponseEntity.status(401).body("Unauthorized");
+		}
+		try {
+	        Claims claim = tokenservice.validateToken(token);
+	        String userID = claim.get("userID", String.class);
+	        if (userID.equals(null)) {
+	            return ResponseEntity.status(401).body("Invalid token");
+	        }
+
+	        return ResponseEntity.ok("User is valid ");
+
+	    } catch (Exception e) {
+	        return ResponseEntity.status(401).body("Token expired or invalid");
+	    }
+	}
 }
