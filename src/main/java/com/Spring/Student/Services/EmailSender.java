@@ -31,12 +31,13 @@ public class EmailSender {
                 .filter(email -> email != null && !email.isEmpty())
                 .collect(Collectors.toList());
 
-        for (String email : emails) {
+//        for (String email : emails) {
         	try {
             // ✅ Create new object every time
 	            SimpleMailMessage message = new SimpleMailMessage();
 	            message.setFrom("lynkjobs09@gmail.com");
-	            message.setTo(email);
+	            System.out.println("Mail sended");
+	            message.setTo("patillavkesh763@gmail.com");
 	            message.setSubject("New Job Opportunity Added on LyNK Jobs!");
 	            message.setText(
 	            	    "Hi,\n\n" +
@@ -59,6 +60,6 @@ public class EmailSender {
         		System.out.println("Failed to send");
         		e.printStackTrace();
         	}
-        }
+//        }
     }
 }
