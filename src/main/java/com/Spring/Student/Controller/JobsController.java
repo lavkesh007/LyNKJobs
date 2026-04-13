@@ -43,7 +43,7 @@ public class JobsController {
 		
 		String adminToken = tokenService.getToken(request);
 		if(adminToken==null) {
-			ResponseEntity.status(401).body("Unauthorized");
+			return ResponseEntity.status(401).body("Unauthorized");
 		}
 		try {
 			Claims claim = tokenService.validateToken(adminToken);

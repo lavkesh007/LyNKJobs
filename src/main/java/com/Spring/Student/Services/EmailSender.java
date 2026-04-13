@@ -35,7 +35,7 @@ public class EmailSender {
         	try {
             // ✅ Create new object every time
 	            SimpleMailMessage message = new SimpleMailMessage();
-	
+	            message.setFrom("lynkjobs09@gmail.com");
 	            message.setTo(email);
 	            message.setSubject("New Job Opportunity Added on LyNK Jobs!");
 	            message.setText(
