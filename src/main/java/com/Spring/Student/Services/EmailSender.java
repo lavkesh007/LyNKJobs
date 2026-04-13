@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.Spring.Student.Repository.UserRepo;
 import com.Spring.Student.UserModel.UserRegister;
-
+@Async
 @Service
 public class EmailSender {
 
@@ -31,7 +31,7 @@ public class EmailSender {
                 .filter(email -> email != null && !email.isEmpty())
                 .collect(Collectors.toList());
 
-//        for (String email : emails) {
+        for (String email : emails) {
         	try {
             // ✅ Create new object every time
 	            SimpleMailMessage message = new SimpleMailMessage();
@@ -60,6 +60,6 @@ public class EmailSender {
         		System.out.println("Failed to send");
         		e.printStackTrace();
         	}
-//        }
+        }
     }
 }
