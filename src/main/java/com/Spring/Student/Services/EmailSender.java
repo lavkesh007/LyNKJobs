@@ -22,7 +22,7 @@ public class EmailSender {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Async
+//    @Async
     public void emailSender(String companyName, String role,String url) {
 
         List<String> emails = userRepo.findAll()
