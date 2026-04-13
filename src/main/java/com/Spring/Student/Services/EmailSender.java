@@ -23,7 +23,7 @@ public class EmailSender {
     private JavaMailSender mailSender;
 
     @Async
-    public void emailSender(String companyName, String role) {
+    public void emailSender(String companyName, String role,String url) {
 
         List<String> emails = userRepo.findAll()
                 .stream()
@@ -48,7 +48,10 @@ public class EmailSender {
             	    "🔔 Not registered yet? Sign up on LyNK Jobs to receive instant notifications about the latest job openings tailored to your profile. Stay ahead of the competition and never miss an opportunity again.\n\n" +
             	    "Your next career move is just a click away. Take action now and apply before the position gets filled!\n\n" +
             	    "Best regards,\n" +
-            	    "Team LyNK Jobs"
+            	    "Team LyNK Jobs \n" +
+            	    "URL: " + url
+            	    
+            	    
             	);
 
             mailSender.send(message);
