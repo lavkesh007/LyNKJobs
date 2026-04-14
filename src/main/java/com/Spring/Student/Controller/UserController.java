@@ -235,7 +235,7 @@ public class UserController {
 	@PostMapping("/settingOTP")
 	public ResponseEntity<?> sendOTPToSetting(HttpServletRequest request){
 		String token = tokenservice.getToken(request);
-		System.out.println("TOKEN: " + token);
+//		System.out.println("TOKEN: " + token);
 		if(token == null) {
 			return ResponseEntity.status(401).body("Unauthorized");
 		}

@@ -144,17 +144,22 @@ public class UserServices {
 	    
 	    
 	    public String OTPSender(String email) {
+	    	System.out.println("enter in the otp Sender");
 	    	int otp = generateNumber();
 	    	UserOtpVerify userOTP = new UserOtpVerify();
 	    	userOTP.setEmail(email);
 	    	userOTP.setOtp(String.valueOf(otp));
 	    	userOTP.setTime(LocalDateTime.now());
+	    	
 	    	userOtpRepo.save(userOTP);
 	    	SimpleMailMessage message = new SimpleMailMessage();
 	    	message.setTo(email);
 	    	message.setSubject("OTP Verification");
 	    	message.setText("Dear User, \n Thank you for part of LyNK Job's.\nYour OTP for account verification is: "+otp +". It is valid for 5 minutes.\nFor security reasons, please do not share this code with anyone.\nIf you did not initiate this request, please ignore this message.");
+	    	System.out.println("Message is REady");
+
 	    	mailSender.send(message);
+	    	System.out.println("Otp sended");
 	    	System.out.print(otp);
 	    	return "Otp Generated";
 	    }
@@ -209,7 +214,7 @@ public class UserServices {
 	    
 	    public String sendOTPToSetting(String userID) {
 	    	UserRegister user = userRepo.findByUserID(userID);
-	    	
+	    	System.out.println("enter in the service");
 	    	return OTPSender(user.getUserEmail());
 	    }
 	    public String verifyOTPToSetting(String userID,String otp) {

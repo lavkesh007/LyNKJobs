@@ -24,7 +24,7 @@ public class EmailSender {
 
     @Async
     public void emailSender(String companyName, String role,String url) {
-
+//    	System.out.print()
         List<String> emails = userRepo.findAll()
                 .stream()
                 .map(UserRegister::getUserEmail)
