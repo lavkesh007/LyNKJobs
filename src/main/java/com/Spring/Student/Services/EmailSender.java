@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.Spring.Student.Repository.UserRepo;
 import com.Spring.Student.UserModel.UserRegister;
-@Async
+//@Async
 @Service
 public class EmailSender {
 
@@ -35,9 +35,9 @@ public class EmailSender {
         	try {
             // ✅ Create new object every time
 	            SimpleMailMessage message = new SimpleMailMessage();
-	            message.setFrom("lynkjobs09@gmail.com");
+//	            message.setFrom("lynkjobs09@gmail.com");
 	            System.out.println("Mail sended");
-	            message.setTo("patillavkesh763@gmail.com");
+	            message.setTo(email);
 	            message.setSubject("New Job Opportunity Added on LyNK Jobs!");
 	            message.setText(
 	            	    "Hi,\n\n" +
