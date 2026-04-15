@@ -22,7 +22,7 @@ public class AdminToken {
 						.setSubject(userName)
 						.claim("adminID", userID)
 						.setIssuedAt(new Date())
-						.setExpiration(new Date(System.currentTimeMillis()+ 1000 * 60 * 60 * 12))
+						.setExpiration(new Date(System.currentTimeMillis()+ 1000 * 60 * 60 * 24))
 						.signWith(SIGN_KEY)
 						.compact();
 		return token;
