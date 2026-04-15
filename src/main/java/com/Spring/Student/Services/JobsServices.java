@@ -74,7 +74,7 @@ public class JobsServices {
 		job.setJobID(id);
 		jobRepo.save(job);
 		presentJob.save(new PresentJobs(id,job.getExpireDate()));
-		sender.emailSender(job.getCompanyName(),job.getRole(),"https://main.d1p27rorpmayh8.amplifyapp.com/user/jobDetail/"+id);
+		sender.emailSender(job.getCompanyName(),job.getRole(),"https://jobslynk.in/user/jobDetail/"+id);
 		return "Job Added!!!";
 	}
 	
