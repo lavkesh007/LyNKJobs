@@ -19,8 +19,19 @@ import com.Spring.Student.UserModel.UserMessage;
 import com.Spring.Student.UserModel.UserOtpVerify;
 import com.Spring.Student.UserModel.UserRegister;
 
+
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
+
 @Service
 public class UserServices {
+	@Autowired
+	private SendGrid sendGrid;
 	@Autowired
 	private UserMessageRepo messageRepo;
 	@Autowired
@@ -145,10 +156,11 @@ public class UserServices {
 	    
 	    public String OTPSender(String email) {
 	        try {
-	            System.out.println("enter in the otp Sender");
+	            System.out.println("Entering OTP Sender");
 
 	            int otp = generateNumber();
 
+	            // Save OTP in DB
 	            UserOtpVerify userOTP = new UserOtpVerify();
 	            userOTP.setEmail(email);
 	            userOTP.setOtp(String.valueOf(otp));
@@ -156,22 +168,43 @@ public class UserServices {
 
 	            userOtpRepo.save(userOTP);
 
-	            SimpleMailMessage message = new SimpleMailMessage();
-	            message.setTo(email);
-	            message.setSubject("OTP Verification");
-	            message.setText("Your OTP is: " + otp);
+	            // ✅ SendGrid Email Setup
+	            Email from = new Email("no-reply@jobslynk.in", "LyNK Jobs"); // 🔥 IMPORTANT
+	            Email to = new Email(email);
 
-	            System.out.println("Message is Ready");
+	            String subject = "OTP Verification - LyNK Jobs";
 
-	            mailSender.send(message);
+	            Content content = new Content(
+	                    "text/plain",
+	                    "Hi,\n\n" +
+	                    "Your OTP for verification is: " + otp + "\n\n" +
+	                    "This OTP is valid for 5 minutes.\n\n" +
+	                    "If you did not request this, please ignore this email.\n\n" +
+	                    "Regards,\nLyNK Jobs"
+	            );
 
-	            System.out.println("Otp sent successfully ✅");
+	            Mail mail = new Mail(from, subject, to, content);
 
-	            return "Otp Generated";
+	            Request request = new Request();
+	            request.setMethod(Method.POST);
+	            request.setEndpoint("mail/send");
+	            request.setBody(mail.build());
+
+	            Response response = sendGrid.api(request);
+
+	            System.out.println("Status Code: " + response.getStatusCode());
+
+	            if (response.getStatusCode() == 202) {
+	                System.out.println("OTP sent successfully ✅");
+	                return "Otp Generated";
+	            } else {
+	                System.out.println("Failed ❌: " + response.getBody());
+	                return "Failed to send OTP";
+	            }
 
 	        } catch (Exception e) {
 	            System.out.println("MAIL ERROR ❌");
-	            e.printStackTrace();   // THIS WILL SHOW REAL ERROR
+	            e.printStackTrace();
 	            return "Failed to send OTP";
 	        }
 	    }

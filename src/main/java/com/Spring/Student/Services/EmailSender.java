@@ -45,14 +45,39 @@ public class EmailSender {
                 String subject = "New Job Opportunity Added on LyNK Jobs!";
 
                 Content content = new Content(
-                	    "text/plain",
-                	    "Hi,\n\n" +
-                	    "I found a job that may match your profile.\n\n" +
-                	    "Company: " + companyName + "\n" +
-                	    "Role: " + role + "\n" +
-                	    "Link: " + url + "\n\n" +
-                	    "Let me know if you're interested.\n\n" +
-                	    "Thanks"
+                	    "text/html",
+                	    "<html>" +
+                	    "<body style='font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 20px;'>" +
+
+                	    "<div style='max-width: 600px; margin: auto; background: #ffffff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'>" +
+
+                	    "<h2 style='color: #2c3e50;'>🚀 New Job Opportunity on LyNK Jobs</h2>" +
+
+                	    "<p style='font-size: 15px; color: #555;'>Hi there,</p>" +
+
+                	    "<p style='font-size: 15px; color: #555;'>We found a job opportunity that might be a great match for your profile. Don't miss out!</p>" +
+
+                	    "<div style='background: #f1f8ff; padding: 15px; border-radius: 8px; margin: 20px 0;'>" +
+                	    "<p style='margin: 5px 0;'><strong>🏢 Company:</strong> " + companyName + "</p>" +
+                	    "<p style='margin: 5px 0;'><strong>💼 Role:</strong> " + role + "</p>" +
+                	    "</div>" +
+
+                	    "<div style='text-align: center; margin: 30px 0;'>" +
+                	    "<a href='" + url + "' style='background: #007bff; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-size: 16px;'>Apply Now</a>" +
+                	    "</div>" +
+
+                	    "<p style='font-size: 14px; color: #555;'>This could be your next big career move. Apply now before the position gets filled!</p>" +
+
+                	    "<hr style='border: none; border-top: 1px solid #eee;'/>" +
+
+                	    "<p style='font-size: 13px; color: #999;'>You are receiving this email because you registered on LyNK Jobs.</p>" +
+
+                	    "<p style='font-size: 13px; color: #999;'>Best regards,<br><strong>Team LyNK Jobs</strong></p>" +
+
+                	    "</div>" +
+
+                	    "</body>" +
+                	    "</html>"
                 	);
 
                 Mail mail = new Mail(from, subject, to, content);
