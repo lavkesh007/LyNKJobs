@@ -168,19 +168,38 @@ public class UserServices {
 
 	            userOtpRepo.save(userOTP);
 
-	            // ✅ SendGrid Email Setup
-	            Email from = new Email("no-reply@jobslynk.in", "LyNK Jobs"); // 🔥 IMPORTANT
+	            // ✅ SendGrid Setup
+	            Email from = new Email("no-reply@jobslynk.in", "LyNK Jobs");
 	            Email to = new Email(email);
 
-	            String subject = "OTP Verification - LyNK Jobs";
+	            String subject = "🔐 OTP Verification - LyNK Jobs";
 
+	            // ✅ HTML Email (IMPORTANT)
 	            Content content = new Content(
-	                    "text/plain",
-	                    "Hi,\n\n" +
-	                    "Your OTP for verification is: " + otp + "\n\n" +
-	                    "This OTP is valid for 5 minutes.\n\n" +
-	                    "If you did not request this, please ignore this email.\n\n" +
-	                    "Regards,\nLyNK Jobs"
+	                "text/html",
+	                "<html>" +
+	                "<body style='font-family: Arial; background:#f4f6f8; padding:20px;'>" +
+
+	                "<div style='max-width:500px;margin:auto;background:#fff;padding:20px;border-radius:10px;'>" +
+
+	                "<h2 style='color:#2c3e50;'>🔐 OTP Verification</h2>" +
+
+	                "<p>Hello,</p>" +
+	                "<p>Your One-Time Password (OTP) is:</p>" +
+
+	                "<h1 style='text-align:center;color:#007bff;letter-spacing:5px;'>" + otp + "</h1>" +
+
+	                "<p style='text-align:center;color:#555;'>Valid for 5 minutes</p>" +
+
+	                "<hr/>" +
+
+	                "<p style='font-size:13px;color:#888;'>If you did not request this OTP, please ignore this email.</p>" +
+
+	                "<p style='font-size:13px;color:#888;'>Regards,<br><b>LyNK Jobs Team</b></p>" +
+
+	                "</div>" +
+	                "</body>" +
+	                "</html>"
 	            );
 
 	            Mail mail = new Mail(from, subject, to, content);
@@ -190,7 +209,23 @@ public class UserServices {
 	            request.setEndpoint("mail/send");
 	            request.setBody(mail.build());
 
-	            Response response = sendGrid.api(request);
+	            // ✅ Retry Logic (VERY IMPORTANT)
+	            Response response = null;
+
+	            for (int i = 0; i < 3; i++) {
+	                try {
+	                    response = sendGrid.api(request);
+	                    break;
+	                } catch (Exception ex) {
+	                    System.out.println("Retry " + (i + 1));
+	                    Thread.sleep(2000);
+	                }
+	            }
+
+	            if (response == null) {
+	                System.out.println("No response from SendGrid ❌");
+	                return "Failed to send OTP";
+	            }
 
 	            System.out.println("Status Code: " + response.getStatusCode());
 
