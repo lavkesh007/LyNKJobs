@@ -23,7 +23,7 @@ public class EmailSender {
     @Autowired
     private SendGrid sendGrid;
 
-    private final String FROM_EMAIL = "lynkjobs09@gmail.com";
+    private final String FROM_EMAIL = "no-reply@jobslynk.in";
     private final String FROM_NAME = "LyNK Jobs";
 
     @Async
