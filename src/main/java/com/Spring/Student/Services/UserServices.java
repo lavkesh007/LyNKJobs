@@ -74,7 +74,7 @@ public class UserServices {
 	        total.setUserName(user.getUserName());
 	        totalRepo.save(total);
 	        userRepo.save(user);
-	        
+	        userOtpRepo.delete(verify);
 	        return "Registered Successfully";
 	    }
 	    
