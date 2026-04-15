@@ -45,15 +45,15 @@ public class EmailSender {
                 String subject = "New Job Opportunity Added on LyNK Jobs!";
 
                 Content content = new Content(
-                        "text/plain",
-                        "Hi,\n\n" +
-                        "We’re excited to inform you that a new job opportunity has just been posted on LyNK Jobs!\n\n" +
-                        "🏢 Company: " + companyName + "\n" +
-                        "💼 Role: " + role + "\n" +
-                        "Apply here: " + url + "\n\n" +
-                        "Don’t miss out on this opportunity!\n\n" +
-                        "Best regards,\nTeam LyNK Jobs"
-                );
+                	    "text/plain",
+                	    "Hi,\n\n" +
+                	    "I found a job that may match your profile.\n\n" +
+                	    "Company: " + companyName + "\n" +
+                	    "Role: " + role + "\n" +
+                	    "Link: " + url + "\n\n" +
+                	    "Let me know if you're interested.\n\n" +
+                	    "Thanks"
+                	);
 
                 Mail mail = new Mail(from, subject, to, content);
 
@@ -65,7 +65,7 @@ public class EmailSender {
                 Response response = sendGrid.api(request);
 
                 System.out.println("Status for " + email + ": " + response.getStatusCode());
-
+                Thread.sleep(1200);
             } catch (Exception e) {
                 System.out.println("Failed to send to: " + email);
                 e.printStackTrace();
