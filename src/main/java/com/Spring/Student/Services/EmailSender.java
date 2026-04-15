@@ -1,18 +1,19 @@
 package com.Spring.Student.Services;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.Spring.Student.Repository.UserRepo;
 import com.Spring.Student.UserModel.UserRegister;
-//@Async
+import com.sendgrid.*;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
+
 @Service
 public class EmailSender {
 
@@ -20,11 +21,14 @@ public class EmailSender {
     private UserRepo userRepo;
 
     @Autowired
-    private JavaMailSender mailSender;
+    private SendGrid sendGrid;
+
+    private final String FROM_EMAIL = "lynkjobs09@gmail.com";
+    private final String FROM_NAME = "LyNK Jobs";
 
     @Async
-    public void emailSender(String companyName, String role,String url) {
-//    	System.out.print()
+    public void emailSender(String companyName, String role, String url) {
+
         List<String> emails = userRepo.findAll()
                 .stream()
                 .map(UserRegister::getUserEmail)
@@ -32,33 +36,40 @@ public class EmailSender {
                 .collect(Collectors.toList());
 
         for (String email : emails) {
-        	try {
-            // ✅ Create new object every time
-	            SimpleMailMessage message = new SimpleMailMessage();
-//	            message.setFrom("lynkjobs09@gmail.com");
-	            System.out.println("Mail sended");
-	            message.setTo(email);
-	            message.setSubject("New Job Opportunity Added on LyNK Jobs!");
-	            message.setText(
-	            	    "Hi,\n\n" +
-	            	    "We’re excited to inform you that a new job opportunity has just been posted on LyNK Jobs!\n\n" +
-	            	    "🏢 Company: " + companyName + "\n" +
-	            	    "💼 Role: " + role + "\n" +
-	            	    "Apply here: " + url + "\n\n" +
-	            	    "If you’ve been looking for the right opportunity to grow your career, this could be the perfect match for you. At LyNK Jobs, we aim to connect talented individuals like you with companies that are actively hiring and looking for your skills.\n\n" +
-	            	    "Don’t miss out on this opportunity! Log in to your LyNK Jobs account today to view complete job details, check eligibility, and submit your application with ease.\n\n" +
-	            	    "🔔 Not registered yet? Sign up on LyNK Jobs to receive instant notifications about the latest job openings tailored to your profile. Stay ahead of the competition and never miss an opportunity again.\n\n" +
-	            	    "Your next career move is just a click away. Take action now and apply before the position gets filled!\n\n" +
-	            	    "Best regards,\n" +
-	            	    "Team LyNK Jobs \n" +
-	            	    "URL: " + url
-	            	);
-	
-	            mailSender.send(message);
-        	}catch(Exception e) {
-        		System.out.println("Failed to send");
-        		e.printStackTrace();
-        	}
+            try {
+                System.out.println("Sending mail to: " + email);
+
+                Email from = new Email(FROM_EMAIL, FROM_NAME);
+                Email to = new Email(email);
+
+                String subject = "New Job Opportunity Added on LyNK Jobs!";
+
+                Content content = new Content(
+                        "text/plain",
+                        "Hi,\n\n" +
+                        "We’re excited to inform you that a new job opportunity has just been posted on LyNK Jobs!\n\n" +
+                        "🏢 Company: " + companyName + "\n" +
+                        "💼 Role: " + role + "\n" +
+                        "Apply here: " + url + "\n\n" +
+                        "Don’t miss out on this opportunity!\n\n" +
+                        "Best regards,\nTeam LyNK Jobs"
+                );
+
+                Mail mail = new Mail(from, subject, to, content);
+
+                Request request = new Request();
+                request.setMethod(Method.POST);
+                request.setEndpoint("mail/send");
+                request.setBody(mail.build());
+
+                Response response = sendGrid.api(request);
+
+                System.out.println("Status for " + email + ": " + response.getStatusCode());
+
+            } catch (Exception e) {
+                System.out.println("Failed to send to: " + email);
+                e.printStackTrace();
+            }
         }
     }
 }
