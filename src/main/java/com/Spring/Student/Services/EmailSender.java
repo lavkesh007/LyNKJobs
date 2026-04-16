@@ -25,8 +25,8 @@ public class EmailSender {
     private SendGrid sendGrid;
 
     // ✅ Use consistent & professional sender
-    private final String FROM_EMAIL = "jobs@em3976.jobslynk.in";
-    private final String FROM_NAME = "LyNK Jobs";
+//    private final String FROM_EMAIL = "jobs@em3976.jobslynk.in";
+//    private final String FROM_NAME = "LyNK Jobs";
 
     @Async
     public void emailSender(String companyName, String role, String url) {
@@ -51,7 +51,7 @@ public class EmailSender {
                 try {
                     System.out.println("Sending mail to: " + email);
 
-                    Email from = new Email(FROM_EMAIL, FROM_NAME);
+                    Email from = new Email("jobs@em3976.jobslynk.in", "LyNK Jobs");
                     Email to = new Email(email);
 
                     String subject = "New Job Update from LyNK Jobs";
