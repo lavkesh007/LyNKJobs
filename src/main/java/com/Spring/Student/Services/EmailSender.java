@@ -13,6 +13,7 @@ import com.sendgrid.*;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
+import com.sendgrid.helpers.mail.objects.Personalization;
 
 @Service
 public class EmailSender {
@@ -23,7 +24,7 @@ public class EmailSender {
     @Autowired
     private SendGrid sendGrid;
 
-    private final String FROM_EMAIL = "no-reply@jobslynk.in";
+    private final String FROM_EMAIL = "no-reply@em3976.jobslynk.in";
     private final String FROM_NAME = "LyNK Jobs";
 
     @Async
@@ -52,31 +53,32 @@ public class EmailSender {
                     Email from = new Email(FROM_EMAIL, FROM_NAME);
                     Email to = new Email(email);
 
-                    String subject = "New Job Opportunity Added on LyNK Jobs!";
+                    String subject = "New Job Update from LyNK Jobs";
 
-                    Content content = new Content(
+                    // ✅ HTML content
+                    Content htmlContent = new Content(
                             "text/html",
                             "<html>" +
                             "<body style='font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 20px;'>" +
 
                             "<div style='max-width: 600px; margin: auto; background: #ffffff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'>" +
 
-                            "<h2 style='color: #2c3e50;'>🚀 New Job Opportunity on LyNK Jobs</h2>" +
+                            "<h2 style='color: #2c3e50;'>New Job Update from LyNK Jobs</h2>" +
 
-                            "<p style='font-size: 15px; color: #555;'>Hi there,</p>" +
+                            "<p style='font-size: 15px; color: #555;'>Hi,</p>" +
 
-                            "<p style='font-size: 15px; color: #555;'>We found a job opportunity that might be a great match for your profile. Don't miss out!</p>" +
+                            "<p style='font-size: 15px; color: #555;'>A new job matching your interest has been posted.</p>" +
 
                             "<div style='background: #f1f8ff; padding: 15px; border-radius: 8px; margin: 20px 0;'>" +
-                            "<p><strong>🏢 Company:</strong> " + companyName + "</p>" +
-                            "<p><strong>💼 Role:</strong> " + role + "</p>" +
+                            "<p><strong>Company:</strong> " + companyName + "</p>" +
+                            "<p><strong>Role:</strong> " + role + "</p>" +
                             "</div>" +
 
                             "<div style='text-align: center; margin: 30px 0;'>" +
-                            "<a href='" + url + "' style='background: #007bff; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px;'>Apply Now</a>" +
+                            "<a href='" + url + "' style='background: #007bff; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px;'>View Job</a>" +
                             "</div>" +
 
-                            "<p style='font-size: 14px; color: #555;'>Apply now before the position gets filled!</p>" +
+                            "<p style='font-size: 14px; color: #555;'>Visit the link above to apply.</p>" +
 
                             "<hr/>" +
 
@@ -84,12 +86,37 @@ public class EmailSender {
 
                             "<p style='font-size: 13px; color: #999;'>Best regards,<br><strong>Team LyNK Jobs</strong></p>" +
 
+                            "<p style='font-size:12px;color:gray'>" +
+                            "If you no longer wish to receive these emails, " +
+                            "<a href='https://jobslynk.in/unsubscribe'>unsubscribe here</a>." +
+                            "</p>" +
+
                             "</div>" +
                             "</body>" +
                             "</html>"
                     );
 
-                    Mail mail = new Mail(from, subject, to, content);
+                    // ✅ Plain text content (ANTI-SPAM FIX)
+                    Content textContent = new Content(
+                            "text/plain",
+                            "New Job Update from LyNK Jobs\n" +
+                            "Company: " + companyName + "\n" +
+                            "Role: " + role + "\n" +
+                            "Apply here: " + url + "\n\n" +
+                            "If you no longer wish to receive emails, visit: https://jobslynk.in/unsubscribe"
+                    );
+
+                    // ✅ Mail setup
+                    Mail mail = new Mail();
+                    mail.setFrom(from);
+                    mail.setSubject(subject);
+
+                    Personalization personalization = new Personalization();
+                    personalization.addTo(to);
+                    mail.addPersonalization(personalization);
+
+                    mail.addContent(textContent);
+                    mail.addContent(htmlContent);
 
                     Request request = new Request();
                     request.setMethod(Method.POST);
@@ -100,11 +127,10 @@ public class EmailSender {
 
                     System.out.println("Status for " + email + ": " + response.getStatusCode());
 
-                    // success → break retry loop
                     sent = true;
 
-                    // delay to avoid rate limiting
-                    Thread.sleep(1200);
+                    // ✅ safer delay
+                    Thread.sleep(2500);
 
                 } catch (Exception e) {
                     attempts++;
