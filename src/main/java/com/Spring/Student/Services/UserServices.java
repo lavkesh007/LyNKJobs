@@ -7,6 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +29,8 @@ import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
+
+import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class UserServices {
@@ -155,6 +158,8 @@ public class UserServices {
 	    }
 	    
 	    
+	    
+
 	    public String OTPSender(String email) {
 	        try {
 	            System.out.println("Entering OTP Sender");
@@ -166,10 +171,7 @@ public class UserServices {
 
 	            int otp = generateNumber();
 
-//	            // ✅ Remove old OTP (IMPORTANT)
-//	            userOtpRepo.deleteByEmail(email);
-
-	            // ✅ Save new OTP
+	            // ✅ Save OTP
 	            UserOtpVerify userOTP = new UserOtpVerify();
 	            userOTP.setEmail(email);
 	            userOTP.setOtp(String.valueOf(otp));
@@ -177,18 +179,18 @@ public class UserServices {
 
 	            userOtpRepo.save(userOTP);
 
-	            // ✅ Sender (authenticated domain)
-	            Email from = new Email("jobs@em3976.jobslynk.in", "LyNK Jobs");
-	            Email to = new Email(email);
+	            // ✅ Create Email
+	            MimeMessage message = mailSender.createMimeMessage();
+	            MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-	            String subject = "Your OTP for LyNK Jobs";
+	            helper.setFrom("yourgmail@gmail.com", "LyNK Jobs");
+	            helper.setTo(email);
+	            helper.setSubject("Your OTP for LyNK Jobs");
 
-	            // ✅ HTML content
-	            Content htmlContent = new Content(
-	                    "text/html",
+	            // ✅ HTML Content
+	            String htmlContent =
 	                    "<html>" +
 	                    "<body style='font-family: Arial; background:#f4f6f8; padding:20px;'>" +
-
 	                    "<div style='max-width:500px;margin:auto;background:#fff;padding:20px;border-radius:10px;'>" +
 
 	                    "<h2 style='color:#2c3e50;'>OTP Verification</h2>" +
@@ -202,70 +204,20 @@ public class UserServices {
 
 	                    "<hr/>" +
 
-	                    "<p style='font-size:13px;color:#888;'>If you did not request this OTP, please ignore this email.</p>" +
-
+	                    "<p style='font-size:13px;color:#888;'>If you did not request this OTP, ignore this email.</p>" +
 	                    "<p style='font-size:13px;color:#888;'>Regards,<br><b>LyNK Jobs Team</b></p>" +
 
 	                    "</div>" +
 	                    "</body>" +
-	                    "</html>"
-	            );
+	                    "</html>";
 
-	            // ✅ Plain text (ANTI-SPAM)
-	            Content textContent = new Content(
-	                    "text/plain",
-	                    "Your OTP is: " + otp +
-	                    "\nValid for 5 minutes." +
-	                    "\nIf you did not request this, ignore this email."
-	            );
+	            helper.setText(htmlContent, true);
 
-	            // ✅ Mail setup
-	            Mail mail = new Mail();
-	            mail.setFrom(from);
-	            mail.setSubject(subject);
+	            // ✅ Send Email
+	            mailSender.send(message);
 
-	            // 🔥 IMPORTANT (helps Gmail trust & show name)
-	            mail.setReplyTo(new Email("support@jobslynk.in", "LyNK Jobs Support"));
-
-	            Personalization personalization = new Personalization();
-	            personalization.addTo(to);
-	            mail.addPersonalization(personalization);
-
-	            mail.addContent(textContent);
-	            mail.addContent(htmlContent);
-
-	            Request request = new Request();
-	            request.setMethod(Method.POST);
-	            request.setEndpoint("mail/send");
-	            request.setBody(mail.build());
-
-	            // ✅ Retry logic
-	            Response response = null;
-
-	            for (int i = 0; i < 3; i++) {
-	                try {
-	                    response = sendGrid.api(request);
-	                    break;
-	                } catch (Exception ex) {
-	                    System.out.println("Retry " + (i + 1));
-	                    Thread.sleep(2000);
-	                }
-	            }
-
-	            if (response == null) {
-	                System.out.println("No response from SendGrid ❌");
-	                return "Failed to send OTP";
-	            }
-
-	            System.out.println("Status Code: " + response.getStatusCode());
-
-	            if (response.getStatusCode() == 202) {
-	                System.out.println("OTP sent successfully ✅");
-	                return "Otp Generated";
-	            } else {
-	                System.out.println("Failed ❌: " + response.getBody());
-	                return "Failed to send OTP";
-	            }
+	            System.out.println("OTP sent successfully ✅");
+	            return "Otp Generated";
 
 	        } catch (Exception e) {
 	            System.out.println("MAIL ERROR ❌");
