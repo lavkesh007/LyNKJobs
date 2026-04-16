@@ -3,17 +3,16 @@ package com.Spring.Student.Services;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import jakarta.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.Spring.Student.Repository.UserRepo;
 import com.Spring.Student.UserModel.UserRegister;
-import com.sendgrid.*;
-import com.sendgrid.helpers.mail.Mail;
-import com.sendgrid.helpers.mail.objects.Content;
-import com.sendgrid.helpers.mail.objects.Email;
-import com.sendgrid.helpers.mail.objects.Personalization;
 
 @Service
 public class EmailSender {
@@ -22,11 +21,7 @@ public class EmailSender {
     private UserRepo userRepo;
 
     @Autowired
-    private SendGrid sendGrid;
-
-    // ✅ Use consistent & professional sender
-//    private final String FROM_EMAIL = "jobs@em3976.jobslynk.in";
-//    private final String FROM_NAME = "LyNK Jobs";
+    private JavaMailSender mailSender;
 
     @Async
     public void emailSender(String companyName, String role, String url) {
@@ -51,14 +46,15 @@ public class EmailSender {
                 try {
                     System.out.println("Sending mail to: " + email);
 
-                    Email from = new Email("jobs@em3976.jobslynk.in", "LyNK Jobs");
-                    Email to = new Email(email);
+                    MimeMessage message = mailSender.createMimeMessage();
+                    MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-                    String subject = "New Job Update from LyNK Jobs";
+                    helper.setFrom("yourgmail@gmail.com", "LyNK Jobs");
+                    helper.setTo(email);
+                    helper.setSubject("New Job Update from LyNK Jobs");
 
                     // ✅ HTML content
-                    Content htmlContent = new Content(
-                            "text/html",
+                    String htmlContent =
                             "<html>" +
                             "<body style='font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 20px;'>" +
 
@@ -94,47 +90,19 @@ public class EmailSender {
 
                             "</div>" +
                             "</body>" +
-                            "</html>"
-                    );
+                            "</html>";
 
-                    // ✅ Plain text (ANTI-SPAM)
-                    Content textContent = new Content(
-                            "text/plain",
-                            "New Job Update from LyNK Jobs\n" +
-                            "Company: " + companyName + "\n" +
-                            "Role: " + role + "\n" +
-                            "Apply here: " + url + "\n\n" +
-                            "To unsubscribe visit: https://jobslynk.in/unsubscribe"
-                    );
+                    helper.setText(htmlContent, true);
 
-                    // ✅ Mail setup
-                    Mail mail = new Mail();
-                    mail.setFrom(from);
-                    mail.setSubject(subject);
+                    // ✅ Send
+                    mailSender.send(message);
 
-                    // 🔥 IMPORTANT: Reply-To (improves trust & name display)
-                    mail.setReplyTo(new Email("support@jobslynk.in", "LyNK Jobs Support"));
-
-                    Personalization personalization = new Personalization();
-                    personalization.addTo(to);
-                    mail.addPersonalization(personalization);
-
-                    mail.addContent(textContent);
-                    mail.addContent(htmlContent);
-
-                    Request request = new Request();
-                    request.setMethod(Method.POST);
-                    request.setEndpoint("mail/send");
-                    request.setBody(mail.build());
-
-                    Response response = sendGrid.api(request);
-
-                    System.out.println("Status for " + email + ": " + response.getStatusCode());
+                    System.out.println("Mail sent to: " + email + " ✅");
 
                     sent = true;
 
-                    // ✅ safer delay
-                    Thread.sleep(2500);
+                    // ✅ delay to avoid spam block
+                    Thread.sleep(2000);
 
                 } catch (Exception e) {
                     attempts++;
