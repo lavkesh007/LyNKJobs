@@ -24,7 +24,8 @@ public class EmailSender {
     @Autowired
     private SendGrid sendGrid;
 
-    private final String FROM_EMAIL = "no-reply@em3976.jobslynk.in";
+    // ✅ Use consistent & professional sender
+    private final String FROM_EMAIL = "jobs@em3976.jobslynk.in";
     private final String FROM_NAME = "LyNK Jobs";
 
     @Async
@@ -61,7 +62,7 @@ public class EmailSender {
                             "<html>" +
                             "<body style='font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 20px;'>" +
 
-                            "<div style='max-width: 600px; margin: auto; background: #ffffff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'>" +
+                            "<div style='max-width: 600px; margin: auto; background: #ffffff; border-radius: 10px; padding: 20px;'>" +
 
                             "<h2 style='color: #2c3e50;'>New Job Update from LyNK Jobs</h2>" +
 
@@ -96,20 +97,23 @@ public class EmailSender {
                             "</html>"
                     );
 
-                    // ✅ Plain text content (ANTI-SPAM FIX)
+                    // ✅ Plain text (ANTI-SPAM)
                     Content textContent = new Content(
                             "text/plain",
                             "New Job Update from LyNK Jobs\n" +
                             "Company: " + companyName + "\n" +
                             "Role: " + role + "\n" +
                             "Apply here: " + url + "\n\n" +
-                            "If you no longer wish to receive emails, visit: https://jobslynk.in/unsubscribe"
+                            "To unsubscribe visit: https://jobslynk.in/unsubscribe"
                     );
 
                     // ✅ Mail setup
                     Mail mail = new Mail();
                     mail.setFrom(from);
                     mail.setSubject(subject);
+
+                    // 🔥 IMPORTANT: Reply-To (improves trust & name display)
+                    mail.setReplyTo(new Email("support@jobslynk.in", "LyNK Jobs Support"));
 
                     Personalization personalization = new Personalization();
                     personalization.addTo(to);

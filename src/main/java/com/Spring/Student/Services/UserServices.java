@@ -27,6 +27,7 @@ import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
+import com.sendgrid.helpers.mail.objects.Personalization;
 
 @Service
 public class UserServices {
@@ -158,9 +159,17 @@ public class UserServices {
 	        try {
 	            System.out.println("Entering OTP Sender");
 
+	            // ✅ Validate email
+	            if (email == null || email.isEmpty()) {
+	                return "Invalid email";
+	            }
+
 	            int otp = generateNumber();
 
-	            // Save OTP in DB
+//	            // ✅ Remove old OTP (IMPORTANT)
+//	            userOtpRepo.deleteByEmail(email);
+
+	            // ✅ Save new OTP
 	            UserOtpVerify userOTP = new UserOtpVerify();
 	            userOTP.setEmail(email);
 	            userOTP.setOtp(String.valueOf(otp));
@@ -168,48 +177,69 @@ public class UserServices {
 
 	            userOtpRepo.save(userOTP);
 
-	            // ✅ SendGrid Setup
-	            Email from = new Email("no-reply@jobslynk.in", "LyNK Jobs");
+	            // ✅ Sender (authenticated domain)
+	            Email from = new Email("jobs@em3976.jobslynk.in", "LyNK Jobs");
 	            Email to = new Email(email);
 
-	            String subject = "🔐 OTP Verification - LyNK Jobs";
+	            String subject = "Your OTP for LyNK Jobs";
 
-	            // ✅ HTML Email (IMPORTANT)
-	            Content content = new Content(
-	                "text/html",
-	                "<html>" +
-	                "<body style='font-family: Arial; background:#f4f6f8; padding:20px;'>" +
+	            // ✅ HTML content
+	            Content htmlContent = new Content(
+	                    "text/html",
+	                    "<html>" +
+	                    "<body style='font-family: Arial; background:#f4f6f8; padding:20px;'>" +
 
-	                "<div style='max-width:500px;margin:auto;background:#fff;padding:20px;border-radius:10px;'>" +
+	                    "<div style='max-width:500px;margin:auto;background:#fff;padding:20px;border-radius:10px;'>" +
 
-	                "<h2 style='color:#2c3e50;'>🔐 OTP Verification</h2>" +
+	                    "<h2 style='color:#2c3e50;'>OTP Verification</h2>" +
 
-	                "<p>Hello,</p>" +
-	                "<p>Your One-Time Password (OTP) is:</p>" +
+	                    "<p>Hello,</p>" +
+	                    "<p>Your One-Time Password (OTP) is:</p>" +
 
-	                "<h1 style='text-align:center;color:#007bff;letter-spacing:5px;'>" + otp + "</h1>" +
+	                    "<h1 style='text-align:center;color:#007bff;letter-spacing:5px;'>" + otp + "</h1>" +
 
-	                "<p style='text-align:center;color:#555;'>Valid for 5 minutes</p>" +
+	                    "<p style='text-align:center;color:#555;'>Valid for 5 minutes</p>" +
 
-	                "<hr/>" +
+	                    "<hr/>" +
 
-	                "<p style='font-size:13px;color:#888;'>If you did not request this OTP, please ignore this email.</p>" +
+	                    "<p style='font-size:13px;color:#888;'>If you did not request this OTP, please ignore this email.</p>" +
 
-	                "<p style='font-size:13px;color:#888;'>Regards,<br><b>LyNK Jobs Team</b></p>" +
+	                    "<p style='font-size:13px;color:#888;'>Regards,<br><b>LyNK Jobs Team</b></p>" +
 
-	                "</div>" +
-	                "</body>" +
-	                "</html>"
+	                    "</div>" +
+	                    "</body>" +
+	                    "</html>"
 	            );
 
-	            Mail mail = new Mail(from, subject, to, content);
+	            // ✅ Plain text (ANTI-SPAM)
+	            Content textContent = new Content(
+	                    "text/plain",
+	                    "Your OTP is: " + otp +
+	                    "\nValid for 5 minutes." +
+	                    "\nIf you did not request this, ignore this email."
+	            );
+
+	            // ✅ Mail setup
+	            Mail mail = new Mail();
+	            mail.setFrom(from);
+	            mail.setSubject(subject);
+
+	            // 🔥 IMPORTANT (helps Gmail trust & show name)
+	            mail.setReplyTo(new Email("support@jobslynk.in", "LyNK Jobs Support"));
+
+	            Personalization personalization = new Personalization();
+	            personalization.addTo(to);
+	            mail.addPersonalization(personalization);
+
+	            mail.addContent(textContent);
+	            mail.addContent(htmlContent);
 
 	            Request request = new Request();
 	            request.setMethod(Method.POST);
 	            request.setEndpoint("mail/send");
 	            request.setBody(mail.build());
 
-	            // ✅ Retry Logic (VERY IMPORTANT)
+	            // ✅ Retry logic
 	            Response response = null;
 
 	            for (int i = 0; i < 3; i++) {
