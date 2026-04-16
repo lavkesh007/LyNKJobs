@@ -35,65 +35,91 @@ public class EmailSender {
                 .filter(email -> email != null && !email.isEmpty())
                 .collect(Collectors.toList());
 
+        if (emails.isEmpty()) {
+            System.out.println("No users found to send emails.");
+            return;
+        }
+
         for (String email : emails) {
-            try {
-                System.out.println("Sending mail to: " + email);
 
-                Email from = new Email(FROM_EMAIL, FROM_NAME);
-                Email to = new Email(email);
+            int attempts = 0;
+            boolean sent = false;
 
-                String subject = "New Job Opportunity Added on LyNK Jobs!";
+            while (attempts < 3 && !sent) {
+                try {
+                    System.out.println("Sending mail to: " + email);
 
-                Content content = new Content(
-                	    "text/html",
-                	    "<html>" +
-                	    "<body style='font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 20px;'>" +
+                    Email from = new Email(FROM_EMAIL, FROM_NAME);
+                    Email to = new Email(email);
 
-                	    "<div style='max-width: 600px; margin: auto; background: #ffffff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'>" +
+                    String subject = "New Job Opportunity Added on LyNK Jobs!";
 
-                	    "<h2 style='color: #2c3e50;'>🚀 New Job Opportunity on LyNK Jobs</h2>" +
+                    Content content = new Content(
+                            "text/html",
+                            "<html>" +
+                            "<body style='font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 20px;'>" +
 
-                	    "<p style='font-size: 15px; color: #555;'>Hi there,</p>" +
+                            "<div style='max-width: 600px; margin: auto; background: #ffffff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'>" +
 
-                	    "<p style='font-size: 15px; color: #555;'>We found a job opportunity that might be a great match for your profile. Don't miss out!</p>" +
+                            "<h2 style='color: #2c3e50;'>🚀 New Job Opportunity on LyNK Jobs</h2>" +
 
-                	    "<div style='background: #f1f8ff; padding: 15px; border-radius: 8px; margin: 20px 0;'>" +
-                	    "<p style='margin: 5px 0;'><strong>🏢 Company:</strong> " + companyName + "</p>" +
-                	    "<p style='margin: 5px 0;'><strong>💼 Role:</strong> " + role + "</p>" +
-                	    "</div>" +
+                            "<p style='font-size: 15px; color: #555;'>Hi there,</p>" +
 
-                	    "<div style='text-align: center; margin: 30px 0;'>" +
-                	    "<a href='" + url + "' style='background: #007bff; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-size: 16px;'>Apply Now</a>" +
-                	    "</div>" +
+                            "<p style='font-size: 15px; color: #555;'>We found a job opportunity that might be a great match for your profile. Don't miss out!</p>" +
 
-                	    "<p style='font-size: 14px; color: #555;'>This could be your next big career move. Apply now before the position gets filled!</p>" +
+                            "<div style='background: #f1f8ff; padding: 15px; border-radius: 8px; margin: 20px 0;'>" +
+                            "<p><strong>🏢 Company:</strong> " + companyName + "</p>" +
+                            "<p><strong>💼 Role:</strong> " + role + "</p>" +
+                            "</div>" +
 
-                	    "<hr style='border: none; border-top: 1px solid #eee;'/>" +
+                            "<div style='text-align: center; margin: 30px 0;'>" +
+                            "<a href='" + url + "' style='background: #007bff; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px;'>Apply Now</a>" +
+                            "</div>" +
 
-                	    "<p style='font-size: 13px; color: #999;'>You are receiving this email because you registered on LyNK Jobs.</p>" +
+                            "<p style='font-size: 14px; color: #555;'>Apply now before the position gets filled!</p>" +
 
-                	    "<p style='font-size: 13px; color: #999;'>Best regards,<br><strong>Team LyNK Jobs</strong></p>" +
+                            "<hr/>" +
 
-                	    "</div>" +
+                            "<p style='font-size: 13px; color: #999;'>You are receiving this email because you registered on LyNK Jobs.</p>" +
 
-                	    "</body>" +
-                	    "</html>"
-                	);
+                            "<p style='font-size: 13px; color: #999;'>Best regards,<br><strong>Team LyNK Jobs</strong></p>" +
 
-                Mail mail = new Mail(from, subject, to, content);
+                            "</div>" +
+                            "</body>" +
+                            "</html>"
+                    );
 
-                Request request = new Request();
-                request.setMethod(Method.POST);
-                request.setEndpoint("mail/send");
-                request.setBody(mail.build());
+                    Mail mail = new Mail(from, subject, to, content);
 
-                Response response = sendGrid.api(request);
+                    Request request = new Request();
+                    request.setMethod(Method.POST);
+                    request.setEndpoint("mail/send");
+                    request.setBody(mail.build());
 
-                System.out.println("Status for " + email + ": " + response.getStatusCode());
-                Thread.sleep(1200);
-            } catch (Exception e) {
-                System.out.println("Failed to send to: " + email);
-                e.printStackTrace();
+                    Response response = sendGrid.api(request);
+
+                    System.out.println("Status for " + email + ": " + response.getStatusCode());
+
+                    // success → break retry loop
+                    sent = true;
+
+                    // delay to avoid rate limiting
+                    Thread.sleep(1200);
+
+                } catch (Exception e) {
+                    attempts++;
+                    System.out.println("Retry " + attempts + " for: " + email);
+
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+
+            if (!sent) {
+                System.out.println("Failed after retries: " + email);
             }
         }
     }
