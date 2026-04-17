@@ -35,8 +35,6 @@ import jakarta.mail.internet.MimeMessage;
 @Service
 public class UserServices {
 	@Autowired
-	private SendGrid sendGrid;
-	@Autowired
 	private UserMessageRepo messageRepo;
 	@Autowired
 	private CloudnairyServices cloudServices;
