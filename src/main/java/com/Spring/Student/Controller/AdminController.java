@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.Spring.Student.AdminModel.AdminLoginCredentials;
 import com.Spring.Student.DTO.AdminDTO;
 import com.Spring.Student.Services.AdminServices;
+import com.Spring.Student.Services.EmailSender;
 import com.Spring.Student.Services.JobsServices;
 
 import io.jsonwebtoken.Claims;
@@ -25,7 +26,8 @@ import jakarta.servlet.http.HttpServletRequest;
 @CrossOrigin(origins = "*") 
 @RequestMapping("/admin")
 public class AdminController {
-	
+	@Autowired
+	EmailSender emailSender;
 	AdminServices services;
 	AdminToken tokenservices;
 	public AdminController(AdminServices services,AdminToken tokenservice) {
@@ -141,6 +143,39 @@ public class AdminController {
 			String adminName = claim.getSubject();
 			
 			return ResponseEntity.ok(services.getStats());
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(401).body(Map.of("message","Invalid Token"));
+		}
+	}
+	
+	@PostMapping("/mailSender")
+	public ResponseEntity<?> adminMailSender(HttpServletRequest request,@RequestBody Map<String,String> msg){
+		String adminToken = tokenservices.getToken(request);
+		if(adminToken == null) {
+			return ResponseEntity.status(401).body(Map.of("message","Unauthorized"));
+		}
+		try {
+			Claims claim = tokenservices.validateToken(adminToken);
+			String adminId = claim.get("adminID",String.class);
+			if (adminId == null || adminId.isEmpty()) {
+	            return ResponseEntity.status(403)
+	                    .body(Map.of("message", "Access Denied"));
+	        }
+			
+			String Subject = msg.get("subject");
+			String Message = msg.get("message");
+			
+			if (Subject == null || Subject.isEmpty() ||
+		            Message == null || Message.isEmpty()) {
+
+		            return ResponseEntity.badRequest()
+		                    .body(Map.of("message", "Subject and message are required"));
+		        }
+			emailSender.AdminMailSender(Subject, Message);
+			
+			return ResponseEntity.ok(Map.of("message","Mail Sent Successfully"));
 			
 		}catch(Exception e) {
 			e.printStackTrace();
