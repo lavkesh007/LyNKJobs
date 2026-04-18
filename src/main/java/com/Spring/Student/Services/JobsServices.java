@@ -10,8 +10,11 @@ import com.Spring.Student.UserModel.UserMessage;
 import com.Spring.Student.UserModel.UserRegister;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
@@ -105,12 +108,44 @@ public class JobsServices {
 	
 	public List<Jobs> getSearchJobs(String role, String location){
     	if(role=="") {
-    		return jobRepo.findByLocationContainingIgnoreCase(location);
+    		List<Jobs> allJobs =  jobRepo.findByLocationContainingIgnoreCase(location);
+    		Set<String> jobIds = presentJob.findAll().stream()
+    	            .map(PresentJobs::getJobID)
+    	            .collect(Collectors.toSet());
+    		List<Jobs> jobs = new ArrayList<>();
+    		for(Jobs job : allJobs) {
+    			if(jobIds.contains(job.getJobID())) {
+    				jobs.add(job);
+    			}
+    		}
+    		return jobs;
     	}
     	if(location=="") {
-    		return jobRepo.findByRoleContainingIgnoreCaseOrSkillContainingIgnoreCase(role,role);
+    		List<Jobs> allJobs = jobRepo.findByRoleContainingIgnoreCaseOrSkillContainingIgnoreCase(role,role);
+    		Set<String> jobIds = presentJob.findAll().stream()
+    	            .map(PresentJobs::getJobID)
+    	            .collect(Collectors.toSet());
+    		List<Jobs> jobs = new ArrayList<>();
+    		for(Jobs job : allJobs) {
+    			if(jobIds.contains(job.getJobID())) {
+    				jobs.add(job);
+    			}
+    		}
+    		return jobs;
+    		
     	}
-    	return jobRepo.findByRoleContainingIgnoreCaseOrSkillContainingIgnoreCaseAndLocationContainingIgnoreCase(role,role, location);
+    	List<Jobs> allJobs =  jobRepo.findByRoleContainingIgnoreCaseOrSkillContainingIgnoreCaseAndLocationContainingIgnoreCase(role,role, location);
+    	Set<String> jobIds = presentJob.findAll().stream()
+	            .map(PresentJobs::getJobID)
+	            .collect(Collectors.toSet());
+    	List<Jobs> jobs = new ArrayList<>();
+		for(Jobs job : allJobs) {
+			if(jobIds.contains(job.getJobID())) {
+				jobs.add(job);
+			}
+		}
+		return jobs;
+    	
     }
 	
 	public String deleteJob(String jobID) {
