@@ -40,7 +40,7 @@ public class ApplyJobsServices {
 	    appliedJobs.sort(
 	    	    Comparator.comparing(
 	    	        UserAppliedJobs::getApplyDateTime,
-	    	        Comparator.nullsLast(Comparator.naturalOrder())
+	    	        Comparator.nullsLast(Comparator.reverseOrder())
 	    	    )
 	    	);
 	    List<Jobs> jobs = new ArrayList<>();
