@@ -30,8 +30,9 @@ public class JobApply {
 		}
 		try {
 			Claims claim = tokenService.validateToken(token);
+			String name = claim.getSubject();
 			String userID = claim.get("userID",String.class);
-			return ResponseEntity.ok(Map.of("message",applyService.applyJob(userID, jobID)));
+			return ResponseEntity.ok(Map.of("message",applyService.applyJob(userID, jobID,name)));
 		}catch(Exception e) {
 			return ResponseEntity.status(401).body("Invalid Token");
 		}

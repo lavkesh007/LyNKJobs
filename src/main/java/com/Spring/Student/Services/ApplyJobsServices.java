@@ -1,6 +1,8 @@
 package com.Spring.Student.Services;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +24,12 @@ public class ApplyJobsServices {
 		this.applyRepo = applyRepo;
 	}
 	
-	public String applyJob(String UserID,String JobID) {
+	public String applyJob(String UserID,String JobID,String name) {
 		UserAppliedJobs user = new UserAppliedJobs();
 		user.setUserID(UserID);
 		user.setJobID(JobID);
+		user.setUserName(name);
+		user.setApplyDateTime(LocalDateTime.now());
 		applyRepo.save(user);
 		return "Applied";
 	}
@@ -33,6 +37,7 @@ public class ApplyJobsServices {
 	public List<Jobs> getAllJobsIDs(String userID){
 
 	    List<UserAppliedJobs> appliedJobs = applyRepo.findAllByUserID(userID);
+	    appliedJobs.sort(Comparator.comparing(UserAppliedJobs::getApplyDateTime));
 
 	    List<Jobs> jobs = new ArrayList<>();
 
