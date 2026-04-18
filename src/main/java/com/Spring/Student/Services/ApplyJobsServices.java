@@ -37,8 +37,12 @@ public class ApplyJobsServices {
 	public List<Jobs> getAllJobsIDs(String userID){
 
 	    List<UserAppliedJobs> appliedJobs = applyRepo.findAllByUserID(userID);
-	    appliedJobs.sort(Comparator.comparing(UserAppliedJobs::getApplyDateTime));
-
+	    appliedJobs.sort(
+	    	    Comparator.comparing(
+	    	        UserAppliedJobs::getApplyDateTime,
+	    	        Comparator.nullsLast(Comparator.naturalOrder())
+	    	    )
+	    	);
 	    List<Jobs> jobs = new ArrayList<>();
 
 	    for(UserAppliedJobs u : appliedJobs) {
