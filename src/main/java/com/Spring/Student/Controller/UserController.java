@@ -53,7 +53,7 @@ public class UserController {
 	
 	
 	
-	@PostMapping("/login")
+	@PostMapping("/log")
 	public ResponseEntity<?> login(@RequestBody UserRegister user) {
 		String result = service.Login(user.getUserEmail(), user.getPassword());
 	    if(result.equals( "User Not Found")) {
