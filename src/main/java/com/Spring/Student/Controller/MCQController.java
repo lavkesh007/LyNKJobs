@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.Spring.Student.Configuration.MCQScheduler;
 import com.Spring.Student.Repository.MCQsRepository;
 import com.Spring.Student.Services.GeminiService;
 //import com.sun.tools.javac.util.List;
@@ -22,6 +23,8 @@ public class MCQController {
 	    private MCQsRepository repository;
 	@Autowired
     private GeminiService service;
+	@Autowired
+	private MCQScheduler scheduler;
 
 	@GetMapping("/{subject}")
     public List<Mcqs> getMCQs(@PathVariable String subject) {
@@ -31,4 +34,9 @@ public class MCQController {
 
         return repository.findBySubjectAndDate(subject, LocalDate.now());
     }
+	@GetMapping("/generate")
+	public String generateNow() {
+	    scheduler.generateDailyMCQs();
+	    return "MCQs Generated!";
+	}
 }
