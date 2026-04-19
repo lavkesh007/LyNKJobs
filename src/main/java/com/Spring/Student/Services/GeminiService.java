@@ -8,7 +8,7 @@ import java.net.URL;
 
 @Service
 public class GeminiService {
-	@Value("${gemini.api.key}")
+	@Value("${openai.api.key}")
     private String apiKey;
 
     public String generateMCQs(String topic) {
