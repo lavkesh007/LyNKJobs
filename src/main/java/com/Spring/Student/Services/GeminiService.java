@@ -10,34 +10,29 @@ import java.net.URL;
 @Service
 public class GeminiService {
 
-    // ✅ FIXED KEY NAME
+    // ✅ FIXED
     @Value("${openai.api.key}")
     private String apiKey;
 
     public String generateMCQs(String topic) {
         try {
-        	URL url = new URL(
-        		    "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=" + apiKey
-        		);
+
+            URL url = new URL(
+                "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=" + apiKey
+            );
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setDoOutput(true);
 
-            String prompt = "Generate 5 MCQs on " + topic +
-                    " in JSON format like this:\n" +
-                    "[{\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":\"...\"}]";
+            // ✅ MATCH YOUR DB STRUCTURE
+            String prompt = "Generate 10 MCQs on " + topic +
+                    " strictly in JSON format like this:\n" +
+                    "[{\"question\":\"...\",\"options\":\"A) ... | B) ... | C) ... | D) ...\",\"answer\":\"A\"}]";
 
-            String body = "{\n" +
-                    "  \"contents\": [\n" +
-                    "    {\n" +
-                    "      \"parts\": [\n" +
-                    "        {\"text\": \"" + prompt.replace("\"", "\\\"") + "\"}\n" +
-                    "      ]\n" +
-                    "    }\n" +
-                    "  ]\n" +
-                    "}";
+            String body = "{ \"contents\": [{ \"parts\": [{ \"text\": \"" 
+                    + prompt.replace("\"", "\\\"") + "\" }] }] }";
 
             // ✅ SEND REQUEST
             OutputStream os = conn.getOutputStream();
@@ -45,7 +40,6 @@ public class GeminiService {
             os.flush();
             os.close();
 
-            // ✅ FIXED RESPONSE HANDLING
             int responseCode = conn.getResponseCode();
 
             BufferedReader br;
@@ -65,11 +59,16 @@ public class GeminiService {
 
             br.close();
 
-            return "Status: " + responseCode + "\n" + response.toString();
+            // ❌ DO NOT ADD "Status:"
+            if (responseCode >= 200 && responseCode < 300) {
+                return response.toString(); // ✅ clean JSON
+            } else {
+                return null; // let scheduler skip
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "Gemini Error: " + e.getMessage();
+            return null;
         }
     }
 }
