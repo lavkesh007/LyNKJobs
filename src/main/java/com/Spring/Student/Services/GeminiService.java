@@ -11,40 +11,42 @@ import java.net.URL;
 public class GeminiService {
 
     // ✅ FIXED
-    @Value("${openai.api.key}")
+	@Value("${openai.api.key}")
     private String apiKey;
 
     public String generateMCQs(String topic) {
         try {
 
-            URL url = new URL(
-                "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=" + apiKey
-            );
+            URL url = new URL("https://api.groq.com/openai/v1/chat/completions");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
+
+            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
             conn.setRequestProperty("Content-Type", "application/json");
+
             conn.setDoOutput(true);
 
-            // ✅ MATCH YOUR DB STRUCTURE
             String prompt = "Generate 10 MCQs on " + topic +
-                    " strictly in JSON format like this:\n" +
+                    " strictly in JSON format like:\n" +
                     "[{\"question\":\"...\",\"options\":\"A) ... | B) ... | C) ... | D) ...\",\"answer\":\"A\"}]";
 
-            String body = "{ \"contents\": [{ \"parts\": [{ \"text\": \"" 
-                    + prompt.replace("\"", "\\\"") + "\" }] }] }";
+            String body = "{\n" +
+                    "  \"model\": \"llama3-8b-8192\",\n" +
+                    "  \"messages\": [\n" +
+                    "    {\"role\": \"user\", \"content\": \"" + prompt.replace("\"", "\\\"") + "\"}\n" +
+                    "  ]\n" +
+                    "}";
 
-            // ✅ SEND REQUEST
             OutputStream os = conn.getOutputStream();
             os.write(body.getBytes());
             os.flush();
             os.close();
 
-            int responseCode = conn.getResponseCode();
-
             BufferedReader br;
+            int code = conn.getResponseCode();
 
-            if (responseCode >= 200 && responseCode < 300) {
+            if (code >= 200 && code < 300) {
                 br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             } else {
                 br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
@@ -59,12 +61,7 @@ public class GeminiService {
 
             br.close();
 
-            // ❌ DO NOT ADD "Status:"
-            if (responseCode >= 200 && responseCode < 300) {
-                return response.toString(); // ✅ clean JSON
-            } else {
-                return null; // let scheduler skip
-            }
+            return response.toString();
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -21,12 +21,10 @@ public class MCQParserService {
             JsonNode root = mapper.readTree(response);
 
             String text = root
-                    .path("candidates")
+                    .path("choices")
                     .get(0)
+                    .path("message")
                     .path("content")
-                    .path("parts")
-                    .get(0)
-                    .path("text")
                     .asText();
 
             // clean markdown
