@@ -16,9 +16,9 @@ public class GeminiService {
 
     public String generateMCQs(String topic) {
         try {
-            URL url = new URL(
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey
-            );
+        	URL url = new URL(
+        		    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + apiKey
+        		);
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
