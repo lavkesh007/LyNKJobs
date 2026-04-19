@@ -37,11 +37,12 @@ public class MCQScheduler {
             if (!repository.findBySubjectAndDate(subject, LocalDate.now()).isEmpty()) {
                 continue;
             }
-
+            System.out.println("🔥 Calling Gemini for: " + subject);
             String response = geminiService.generateMCQs(subject);
+            System.out.println("📦 RAW RESPONSE:\n" + response);
 
             List<Mcqs> mcqs = parserService.parse(response, subject);
-
+            System.out.println("✅ Parsed count: " + mcqs.size());
             repository.saveAll(mcqs);
         }
 
