@@ -1,5 +1,4 @@
 package com.Spring.Student.Services;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -8,27 +7,32 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Service
-public class OpenAIService {
-	@Value("${openai.api.key}")
+public class GeminiService {
+	@Value("${gemini.api.key}")
     private String apiKey;
 
     public String generateMCQs(String topic) {
         try {
-            URL url = new URL("https://api.openai.com/v1/chat/completions");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            URL url = new URL(
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey
+            );
 
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setDoOutput(true);
 
-            String prompt = "Generate 5 multiple choice questions (MCQs) on " + topic +
-                    " in JSON format with fields: question, options, answer.";
+            String prompt = "Generate 5 multiple choice questions on " + topic +
+                    " in JSON format like this:\n" +
+                    "[{\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":\"...\"}]";
 
             String body = "{\n" +
-                    "  \"model\": \"gpt-4.1-mini\",\n" +
-                    "  \"messages\": [\n" +
-                    "    {\"role\": \"user\", \"content\": \"" + prompt + "\"}\n" +
+                    "  \"contents\": [\n" +
+                    "    {\n" +
+                    "      \"parts\": [\n" +
+                    "        {\"text\": \"" + prompt.replace("\"", "\\\"") + "\"}\n" +
+                    "      ]\n" +
+                    "    }\n" +
                     "  ]\n" +
                     "}";
 
@@ -53,7 +57,8 @@ public class OpenAIService {
             return response.toString();
 
         } catch (Exception e) {
-            return "Error: " + e.getMessage();
+            e.printStackTrace();
+            return "Gemini Error: " + e.getMessage();
         }
     }
 }

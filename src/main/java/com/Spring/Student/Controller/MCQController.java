@@ -6,13 +6,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.Spring.Student.Services.OpenAIService;
+import com.Spring.Student.Services.GeminiService;
+
 
 @RestController
 @RequestMapping("/mcqs")
 public class MCQController {
 	@Autowired
-    private OpenAIService service;
+    private GeminiService service;
 
     @GetMapping("/{topic}")
     public String getMCQs(@PathVariable String topic) {
