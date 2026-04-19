@@ -1,4 +1,5 @@
 package com.Spring.Student.Services;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -8,7 +9,9 @@ import java.net.URL;
 
 @Service
 public class GeminiService {
-	@Value("${openai.api.key}")
+
+    // ✅ FIXED KEY NAME
+    @Value("${openai.api.key}")
     private String apiKey;
 
     public String generateMCQs(String topic) {
@@ -22,7 +25,7 @@ public class GeminiService {
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setDoOutput(true);
 
-            String prompt = "Generate 5 multiple choice questions on " + topic +
+            String prompt = "Generate 5 MCQs on " + topic +
                     " in JSON format like this:\n" +
                     "[{\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":\"...\"}]";
 
@@ -36,14 +39,22 @@ public class GeminiService {
                     "  ]\n" +
                     "}";
 
+            // ✅ SEND REQUEST
             OutputStream os = conn.getOutputStream();
             os.write(body.getBytes());
             os.flush();
             os.close();
 
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream())
-            );
+            // ✅ FIXED RESPONSE HANDLING
+            int responseCode = conn.getResponseCode();
+
+            BufferedReader br;
+
+            if (responseCode >= 200 && responseCode < 300) {
+                br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            } else {
+                br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+            }
 
             StringBuilder response = new StringBuilder();
             String line;
@@ -54,7 +65,7 @@ public class GeminiService {
 
             br.close();
 
-            return response.toString();
+            return "Status: " + responseCode + "\n" + response.toString();
 
         } catch (Exception e) {
             e.printStackTrace();
