@@ -1,4 +1,5 @@
 package com.Spring.Student.Configuration;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -10,11 +11,18 @@ import java.util.List;
 
 @Configuration
 public class CorsFilterConfig {
-	@Bean
+
+    @Bean
     public FilterRegistrationBean<CorsFilter> corsFilter() {
 
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*"));
+
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "https://jobslynk.in",
+                "https://www.jobslynk.in"
+        ));
+
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
@@ -25,7 +33,7 @@ public class CorsFilterConfig {
         CorsFilter filter = new CorsFilter(source);
 
         FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(filter);
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE); // 🔥 VERY IMPORTANT
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
 
         return bean;
     }
