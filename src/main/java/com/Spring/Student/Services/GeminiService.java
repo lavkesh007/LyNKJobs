@@ -38,7 +38,8 @@ public class GeminiService {
             ObjectMapper mapper = new ObjectMapper();
 
             Map<String, Object> request = new HashMap<>();
-            request.put("model", "llama3-70b-8192");
+//            request.put("model", "llama3-70b-8192");
+            request.put("model", "llama-3.1-8b-instant");
 
             List<Map<String, String>> messages = new ArrayList<>();
             Map<String, String> msg = new HashMap<>();
