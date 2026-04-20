@@ -26,7 +26,6 @@ public class MCQScheduler {
     private MCQsRepository repository;
 
     private List<String> subjects = List.of("java", "sql", "aptitude", "cpp", "python", "javascript");
-
     @Scheduled(cron = "0 0 9 * * ?")
     public void generateDailyMCQs() {
 
@@ -34,6 +33,7 @@ public class MCQScheduler {
 
             try {
 
+                // ✅ skip if already exists
                 if (!repository.findBySubjectAndDate(subject, LocalDate.now()).isEmpty()) {
                     continue;
                 }
@@ -42,22 +42,34 @@ public class MCQScheduler {
 
                 String response = geminiService.generateMCQs(subject);
 
-                // 🚨 FIX 1: HANDLE NULL RESPONSE
-                if (response == null) {
+                // ✅ DEBUG LOG (VERY IMPORTANT)
+                System.out.println("📦 RAW RESPONSE: " + response);
+
+                // 🚨 FIX 1: HANDLE NULL OR ERROR RESPONSE
+                if (response == null || response.contains("\"error\"")) {
                     System.out.println("❌ API FAILED → Using fallback");
                     repository.saveAll(generateFallback(subject));
                     continue;
                 }
 
-                List<Mcqs> mcqs = parserService.parse(response, subject);
+                List<Mcqs> mcqs = new ArrayList<>();
 
-                // 🚨 FIX 2: HANDLE EMPTY PARSE
-                if (mcqs.isEmpty()) {
+                try {
+                    mcqs = parserService.parse(response, subject);
+                } catch (Exception e) {
+                    System.out.println("❌ PARSER CRASHED");
+                    e.printStackTrace();
+                }
+
+                // 🚨 FIX 2: HANDLE EMPTY OR NULL PARSE
+                if (mcqs == null || mcqs.isEmpty()) {
                     System.out.println("❌ PARSE FAILED → Using fallback");
                     mcqs = generateFallback(subject);
                 }
 
                 repository.saveAll(mcqs);
+
+                System.out.println("✅ Saved: " + mcqs.size());
 
             } catch (Exception e) {
                 System.out.println("❌ ERROR in subject: " + subject);

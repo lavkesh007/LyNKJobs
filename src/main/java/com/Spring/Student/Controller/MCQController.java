@@ -68,11 +68,21 @@ public class MCQController {
             return ResponseEntity.ok(new ArrayList<>());
         }
     }
+    @GetMapping("/generate")
+    public ResponseEntity<?> generateNow() {
+        try {
+            scheduler.generateDailyMCQs();
+            return ResponseEntity.ok("MCQs Generated Successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok("Fallback Generated"); // ❗ never 500
+        }
+    }
 
     // 🔥 MANUAL GENERATE (FOR TESTING)
-    @GetMapping("/generate")
-    public String generateNow() {
-        scheduler.generateDailyMCQs();
-        return "MCQs Generated!";
-    }
+//    @GetMapping("/generate")
+//    public String generateNow() {
+//        scheduler.generateDailyMCQs();
+//        return "MCQs Generated!";
+//    }
 }
