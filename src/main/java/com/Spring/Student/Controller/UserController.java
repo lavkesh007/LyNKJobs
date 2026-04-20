@@ -311,8 +311,8 @@ public class UserController {
 	        return ResponseEntity.status(401).body("Token expired or invalid");
 	    }
 	}
-	@GetMapping("/stats")
-	public ResponseEntity<?> getstats(){		
+	@GetMapping("/homeStats")
+	public ResponseEntity<?> getHomestats(){		
 			return ResponseEntity.ok(adminServices.getStats());
 	}
 }
