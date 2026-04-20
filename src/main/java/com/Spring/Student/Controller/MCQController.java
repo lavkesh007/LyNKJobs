@@ -38,16 +38,18 @@ public class MCQController {
 
             String token = tokenservice.getToken(request);
 
-            // 🔥 HANDLE TOKEN SAFELY
-            if (token != null) {
-                try {
-                    tokenservice.validateToken(token);
-                } catch (Exception e) {
-                	
-                    System.out.println("❌ Token invalid or expired");
-                    return (ResponseEntity<List<Mcqs>>) ResponseEntity.status(401);
-                    // 👉 DO NOT FAIL — just continue without auth
-                }
+            // ❌ NO TOKEN → FORCE LOGIN
+            if (token == null || token.isEmpty()) {
+                System.out.println("❌ No token found");
+                return ResponseEntity.status(401).build();
+            }
+
+            // ❌ INVALID TOKEN
+            try {
+                tokenservice.validateToken(token);
+            } catch (Exception e) {
+                System.out.println("❌ Invalid / Expired token");
+                return ResponseEntity.status(401).build();
             }
 
             subject = subject.toLowerCase();
@@ -67,18 +69,7 @@ public class MCQController {
             System.out.println("❌ ERROR IN MCQ API");
             e.printStackTrace();
 
-            // ❗ NEVER RETURN 500 TO FRONTEND
             return ResponseEntity.ok(new ArrayList<>());
-        }
-    }
-    @GetMapping("/generate")
-    public ResponseEntity<?> generateNow() {
-        try {
-            scheduler.generateDailyMCQs();
-            return ResponseEntity.ok("MCQs Generated Successfully");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.ok("Fallback Generated"); // ❗ never 500
         }
     }
 
