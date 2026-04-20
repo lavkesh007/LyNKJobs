@@ -31,37 +31,34 @@ public class MCQController {
 
     // ✅ GET MCQs
     @GetMapping("/{subject}")
-    public ResponseEntity<?> getMCQs(HttpServletRequest request, @PathVariable String subject) {
+    public ResponseEntity<List<Mcqs>> getMCQs(HttpServletRequest request, @PathVariable String subject) {
 
         try {
             String token = tokenservice.getToken(request);
 
-            // 🔒 TOKEN CHECK
             if (token == null) {
                 return ResponseEntity.status(401).body(new ArrayList<>());
             }
 
-            Claims claim = tokenservice.validateToken(token);
-            String userID = claim.get("userID", String.class);
+            try {
+                tokenservice.validateToken(token);
+            } catch (Exception e) {
+                // 🔥 FIX: HANDLE EXPIRED TOKEN
+                return ResponseEntity.status(401).body(new ArrayList<>());
+            }
 
             subject = subject.toLowerCase();
 
             List<Mcqs> data = repository.findBySubjectAndDate(subject, LocalDate.now());
 
-            // ✅ SAFETY: never return null
             if (data == null) {
                 data = new ArrayList<>();
             }
 
-            System.out.println("📦 MCQs fetched: " + data.size());
-
             return ResponseEntity.ok(data);
 
         } catch (Exception e) {
-            System.out.println("❌ ERROR in /mcqs API");
             e.printStackTrace();
-
-            // 🚨 IMPORTANT: always return array (never string)
             return ResponseEntity.status(500).body(new ArrayList<>());
         }
     }
