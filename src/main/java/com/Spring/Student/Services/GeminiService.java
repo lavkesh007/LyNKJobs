@@ -1,17 +1,19 @@
 package com.Spring.Student.Services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.*;
 
 @Service
 public class GeminiService {
 
-    // ✅ FIXED
-	@Value("${openai.api.key}")
+    // ✅ correct key name
+    @Value("${openai.api.key}")
     private String apiKey;
 
     public String generateMCQs(String topic) {
@@ -27,26 +29,37 @@ public class GeminiService {
 
             conn.setDoOutput(true);
 
+            // ✅ clean prompt (NO newline issues)
             String prompt = "Generate 10 MCQs on " + topic +
-                    " strictly in JSON format like:\n" +
+                    " strictly in JSON format like this: " +
                     "[{\"question\":\"...\",\"options\":\"A) ... | B) ... | C) ... | D) ...\",\"answer\":\"A\"}]";
 
-            String body = "{\n" +
-                    "  \"model\": \"llama3-8b-8192\",\n" +
-                    "  \"messages\": [\n" +
-                    "    {\"role\": \"user\", \"content\": \"" + prompt.replace("\"", "\\\"") + "\"}\n" +
-                    "  ]\n" +
-                    "}";
+            // ✅ USE OBJECTMAPPER (NO JSON BREAK)
+            ObjectMapper mapper = new ObjectMapper();
 
+            Map<String, Object> request = new HashMap<>();
+            request.put("model", "llama3-8b-8192");
+
+            List<Map<String, String>> messages = new ArrayList<>();
+            Map<String, String> msg = new HashMap<>();
+            msg.put("role", "user");
+            msg.put("content", prompt);
+
+            messages.add(msg);
+            request.put("messages", messages);
+
+            String body = mapper.writeValueAsString(request);
+
+            // ✅ send request
             OutputStream os = conn.getOutputStream();
             os.write(body.getBytes());
             os.flush();
             os.close();
 
-            BufferedReader br;
-            int code = conn.getResponseCode();
+            int responseCode = conn.getResponseCode();
 
-            if (code >= 200 && code < 300) {
+            BufferedReader br;
+            if (responseCode >= 200 && responseCode < 300) {
                 br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             } else {
                 br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
@@ -61,9 +74,18 @@ public class GeminiService {
 
             br.close();
 
-            return response.toString();
+            System.out.println("📦 Groq Response Code: " + responseCode);
+            System.out.println("📦 Groq Response Body: " + response);
+
+            // ✅ return only if success
+            if (responseCode >= 200 && responseCode < 300) {
+                return response.toString();
+            } else {
+                return null;
+            }
 
         } catch (Exception e) {
+            System.out.println("❌ Groq API failed");
             e.printStackTrace();
             return null;
         }
