@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,11 +15,17 @@ import com.Spring.Student.Repository.MCQsRepository;
 import com.Spring.Student.Services.GeminiService;
 //import com.sun.tools.javac.util.List;
 import com.Spring.Student.UserModel.Mcqs;
+import com.Spring.Student.UserModel.UserRegister;
+
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 @RestController
 @RequestMapping("/mcqs")
 public class MCQController {
+	@Autowired
+	Token tokenservice;
 	 @Autowired
 	    private MCQsRepository repository;
 	@Autowired
@@ -27,12 +34,23 @@ public class MCQController {
 	private MCQScheduler scheduler;
 
 	@GetMapping("/{subject}")
-    public List<Mcqs> getMCQs(@PathVariable String subject) {
-
+    public ResponseEntity<?> getMCQs(HttpServletRequest request,@PathVariable String subject) {
+		String token = tokenservice.getToken(request);
+		if(token==null) {
+			return ResponseEntity.status(401).body("Unauthorized");
+		}
+		try {
+			Claims claim = tokenservice.validateToken(token);
+			String userID = claim.get("userID", String.class);
+			subject = subject.toLowerCase();
+			return ResponseEntity.ok(repository.findBySubjectAndDate(subject, LocalDate.now()));
+		}catch(Exception e) {
+			return ResponseEntity.status(401).body("Invalid Token");
+		}
         // ✅ handle case issue
-        subject = subject.toLowerCase();
+        
 
-        return repository.findBySubjectAndDate(subject, LocalDate.now());
+//        return repository.findBySubjectAndDate(subject, LocalDate.now());
     }
 	@GetMapping("/generate")
 	public String generateNow() {
