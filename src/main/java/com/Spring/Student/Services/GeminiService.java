@@ -12,7 +12,6 @@ import java.util.*;
 @Service
 public class GeminiService {
 
-    // ✅ correct key name
     @Value("${openai.api.key}")
     private String apiKey;
 
@@ -27,18 +26,18 @@ public class GeminiService {
             conn.setRequestProperty("Authorization", "Bearer " + apiKey);
             conn.setRequestProperty("Content-Type", "application/json");
 
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(15000);
+
             conn.setDoOutput(true);
 
-            // ✅ clean prompt (NO newline issues)
             String prompt = "Generate 10 MCQs on " + topic +
                     " strictly in JSON format like this: " +
                     "[{\"question\":\"...\",\"options\":\"A) ... | B) ... | C) ... | D) ...\",\"answer\":\"A\"}]";
 
-            // ✅ USE OBJECTMAPPER (NO JSON BREAK)
             ObjectMapper mapper = new ObjectMapper();
 
             Map<String, Object> request = new HashMap<>();
-//            request.put("model", "llama3-70b-8192");
             request.put("model", "llama-3.1-8b-instant");
 
             List<Map<String, String>> messages = new ArrayList<>();
@@ -51,7 +50,6 @@ public class GeminiService {
 
             String body = mapper.writeValueAsString(request);
 
-            // ✅ send request
             OutputStream os = conn.getOutputStream();
             os.write(body.getBytes());
             os.flush();
@@ -75,10 +73,8 @@ public class GeminiService {
 
             br.close();
 
-            System.out.println("📦 Groq Response Code: " + responseCode);
-            System.out.println("📦 Groq Response Body: " + response);
+            System.out.println("📦 Groq Code: " + responseCode);
 
-            // ✅ return only if success
             if (responseCode >= 200 && responseCode < 300) {
                 return response.toString();
             } else {
@@ -86,7 +82,7 @@ public class GeminiService {
             }
 
         } catch (Exception e) {
-            System.out.println("❌ Groq API failed");
+            System.out.println("❌ API FAILED");
             e.printStackTrace();
             return null;
         }
