@@ -38,8 +38,7 @@ public class GeminiService {
             ObjectMapper mapper = new ObjectMapper();
 
             Map<String, Object> request = new HashMap<>();
-//            request.put("model", "llama-3.1-8b-instant");
-            request.put("model", "llama-3.3-70b-versatile");
+            request.put("model", "llama-3.1-8b-instant");
 
             List<Map<String, String>> messages = new ArrayList<>();
             Map<String, String> msg = new HashMap<>();
@@ -74,16 +73,19 @@ public class GeminiService {
 
             br.close();
 
-            System.out.println("📦 Groq Code: " + responseCode);
+            System.out.println("📦 API CODE: " + responseCode);
+            System.out.println("📦 API RESPONSE: " + response.toString());
 
+            // 🔥 IMPORTANT FIX
             if (responseCode >= 200 && responseCode < 300) {
                 return response.toString();
             } else {
+                System.out.println("❌ API ERROR DETECTED");
                 return null;
             }
 
         } catch (Exception e) {
-            System.out.println("❌ API FAILED");
+            System.out.println("❌ GEMINI SERVICE FAILED");
             e.printStackTrace();
             return null;
         }
