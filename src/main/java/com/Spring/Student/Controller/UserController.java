@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.Spring.Student.DTO.UserDTO;
+import com.Spring.Student.Services.AdminServices;
 import com.Spring.Student.Services.UserServices;
 import com.Spring.Student.UserModel.UserMessage;
 import com.Spring.Student.UserModel.UserRegister;
@@ -40,6 +42,8 @@ import tools.jackson.databind.ObjectMapper;
 public class UserController {
 	UserServices service;
 	Token tokenservice;
+	@Autowired
+	AdminServices adminServices;
 	UserController(UserServices service ,Token tokenservice){
 		this.service = service;
 		this.tokenservice = tokenservice;
@@ -306,5 +310,9 @@ public class UserController {
 	    } catch (Exception e) {
 	        return ResponseEntity.status(401).body("Token expired or invalid");
 	    }
+	}
+	@GetMapping("/stats")
+	public ResponseEntity<?> getstats(){		
+			return ResponseEntity.ok(adminServices.getStats());
 	}
 }
