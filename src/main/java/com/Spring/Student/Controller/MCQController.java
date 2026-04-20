@@ -3,6 +3,7 @@ package com.Spring.Student.Controller;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,9 @@ public class MCQController {
                 try {
                     tokenservice.validateToken(token);
                 } catch (Exception e) {
+                	
                     System.out.println("❌ Token invalid or expired");
+                    return (ResponseEntity<List<Mcqs>>) ResponseEntity.status(401);
                     // 👉 DO NOT FAIL — just continue without auth
                 }
             }

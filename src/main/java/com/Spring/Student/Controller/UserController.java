@@ -315,4 +315,5 @@ public class UserController {
 	public ResponseEntity<?> getHomestats(){		
 			return ResponseEntity.ok(adminServices.getStats());
 	}
+	
 }
