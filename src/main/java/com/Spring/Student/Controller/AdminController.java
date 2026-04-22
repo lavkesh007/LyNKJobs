@@ -187,13 +187,13 @@ public class AdminController {
 	@GetMapping("/userInfo")
 	public ResponseEntity<?> getUser(HttpServletRequest request){
 		String adminToken = tokenservices.getToken(request);
-		if(adminToken==null) {
-			return ResponseEntity.status(401).body(Map.of("message","Unauthorized"));
-		}
+//		if(adminToken==null) {
+//			return ResponseEntity.status(401).body(Map.of("message","Unauthorized"));
+//		}
 		try {
-			Claims claim = tokenservices.validateToken(adminToken);
-			String adminID = claim.get("adminID",String.class);
-			if(adminID==null) return ResponseEntity.status(401).body(Map.of("message","Unauthorized"));
+//			Claims claim = tokenservices.validateToken(adminToken);
+//			String adminID = claim.get("adminID",String.class);
+//			if(adminID==null) return ResponseEntity.status(401).body(Map.of("message","Unauthorized"));
 			
 			
 			
