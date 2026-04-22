@@ -190,7 +190,7 @@ public class AdminController {
 //		if(adminToken==null) {
 //			return ResponseEntity.status(401).body(Map.of("message","Unauthorized"));
 //		}
-		try {
+//		try {
 //			Claims claim = tokenservices.validateToken(adminToken);
 //			String adminID = claim.get("adminID",String.class);
 //			if(adminID==null) return ResponseEntity.status(401).body(Map.of("message","Unauthorized"));
@@ -199,10 +199,10 @@ public class AdminController {
 			
 			return ResponseEntity.ok(userService.getAllUser());
 			
-		}catch(Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(401).body(Map.of("message","Invalid Token"));
-		}
+//		}catch(Exception e) {
+//			e.printStackTrace();
+//			return ResponseEntity.status(401).body(Map.of("message","Invalid Token"));
+//		}
 	}
 	
 	
