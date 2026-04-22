@@ -186,7 +186,7 @@ public class AdminController {
 	}
 	@GetMapping("/userInfo")
 	public ResponseEntity<?> getUser(HttpServletRequest request){
-		String adminToken = tokenservices.getToken(request);
+//		String adminToken = tokenservices.getToken(request);
 //		if(adminToken==null) {
 //			return ResponseEntity.status(401).body(Map.of("message","Unauthorized"));
 //		}
