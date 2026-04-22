@@ -18,6 +18,7 @@ import com.Spring.Student.DTO.AdminDTO;
 import com.Spring.Student.Services.AdminServices;
 import com.Spring.Student.Services.EmailSender;
 import com.Spring.Student.Services.JobsServices;
+import com.Spring.Student.Services.UserServices;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class AdminController {
 	@Autowired
 	EmailSender emailSender;
+	UserServices userService;
 	AdminServices services;
 	AdminToken tokenservices;
 	public AdminController(AdminServices services,AdminToken tokenservice) {
@@ -182,5 +184,26 @@ public class AdminController {
 			return ResponseEntity.status(401).body(Map.of("message","Invalid Token"));
 		}
 	}
+	@GetMapping("/userInfo")
+	public ResponseEntity<?> getUser(HttpServletRequest request){
+		String adminToken = tokenservices.getToken(request);
+		if(adminToken==null) {
+			return ResponseEntity.status(401).body(Map.of("message","Unauthorized"));
+		}
+		try {
+			Claims claim = tokenservices.validateToken(adminToken);
+			String adminID = claim.get("adminID",String.class);
+			if(adminID==null) return ResponseEntity.status(401).body(Map.of("message","Unauthorized"));
+			
+			
+			
+			return ResponseEntity.ok(userService.getAllUser());
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(401).body(Map.of("message","Invalid Token"));
+		}
+	}
+	
 	
 }

@@ -1,6 +1,7 @@
 package com.Spring.Student.Services;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -70,6 +71,7 @@ public class UserServices {
 	            }
 	        } while (userRepo.existsByUserID(id));
 	        user.setUserID(id);
+	        user.setRegistrationTime(LocalDateTime.now());
 	        TotalUser total = new TotalUser();
 	        total.setUserID(id);
 	        total.setEmail(user.getUserEmail());
@@ -287,7 +289,11 @@ public class UserServices {
 	    	userRepo.deleteById(userID);
 	    	return "User Account Deleted!!";
 	    }
-	}
+	     public List<UserRegister> getAllUser(){
+	    	 return userRepo.findAll();
+	     }
+	
+}
 
 
 

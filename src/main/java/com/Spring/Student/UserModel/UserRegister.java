@@ -3,6 +3,8 @@ package com.Spring.Student.UserModel;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -24,6 +26,7 @@ public class UserRegister {
 	String passoutYear;
 	
 	@Column
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	String password;
 	@Column
 	String gender;
@@ -33,6 +36,31 @@ public class UserRegister {
 	String collegeName;
 	@Column
 	String image;
+	@Column 
+	LocalDateTime registrationTime;
+	public LocalDateTime getRegistrationTime() {
+		return registrationTime;
+	}
+	public void setRegistrationTime(LocalDateTime registrationTime) {
+		this.registrationTime = registrationTime;
+	}
+	public UserRegister(String userID, String userName, String userEmail, Long phoneNo, LocalDate dOB,
+			String passoutYear, String password, String gender, String highQualification, String collegeName,
+			String image, LocalDateTime registrationTime) {
+		super();
+		this.userID = userID;
+		this.userName = userName;
+		this.userEmail = userEmail;
+		PhoneNo = phoneNo;
+		DOB = dOB;
+		this.passoutYear = passoutYear;
+		this.password = password;
+		this.gender = gender;
+		this.highQualification = highQualification;
+		this.collegeName = collegeName;
+		this.image = image;
+		this.registrationTime = registrationTime;
+	}
 	public UserRegister(String userID, String userName, String userEmail, Long phoneNo, LocalDate dOB,String password) {
 		super();
 		this.userID = userID;
@@ -123,11 +151,27 @@ public class UserRegister {
 	}
 	public UserRegister(String userName, String userEmail, Long phoneNo, LocalDate dOB) {
 		super();
-		userName = userName;
-		userEmail = userEmail;
+		this.userName = userName;
+		this.userEmail = userEmail;
 		PhoneNo = phoneNo;
 		DOB = dOB;
 		
+	}
+	public UserRegister(String userID, String userName, String userEmail, Long phoneNo, LocalDate dOB,
+			String passoutYear, String gender, String highQualification, String collegeName, String image,
+			LocalDateTime registrationTime) {
+		super();
+		this.userID = userID;
+		this.userName = userName;
+		this.userEmail = userEmail;
+		PhoneNo = phoneNo;
+		DOB = dOB;
+		this.passoutYear = passoutYear;
+		this.gender = gender;
+		this.highQualification = highQualification;
+		this.collegeName = collegeName;
+		this.image = image;
+		this.registrationTime = registrationTime;
 	}
 	public UserRegister(String userName, String userEmail, Long phoneNo, LocalDate dOB, String passoutYear,
 			String password, String gender, String highQualification, String collegeName, String image) {
