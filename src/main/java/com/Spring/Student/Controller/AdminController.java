@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class AdminController {
 	@Autowired
 	EmailSender emailSender;
+	@Autowired
 	UserServices userService;
 	AdminServices services;
 	AdminToken tokenservices;
