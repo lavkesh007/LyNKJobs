@@ -25,7 +25,7 @@ public class MCQScheduler {
     @Autowired
     private MCQsRepository repository;
 
-    private List<String> subjects = List.of("java", "sql", "aptitude", "cpp", "python", "javascript");
+    private List<String> subjects = List.of("java", "sql", "aptitude", "cpp", "python", "javascript","networking");
     @Scheduled(cron = "0 0 9 * * ?")
     public void generateDailyMCQs() {
 
